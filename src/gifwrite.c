@@ -891,6 +891,24 @@ Gif_FullWriteFile(Gif_Stream *gfs, const Gif_CompressInfo *gcinfo,
   return write_gif(gfs, &grr);
 }
 
+Gif_Record *
+Gif_FullWriteRecord(Gif_Stream *gfs, const Gif_CompressInfo *gcinfo)
+{
+  Gif_Record *gfr = malloc(sizeof(Gif_Record));
+  Gif_Writer grr = {0};
+  grr.byte_putter = memory_byte_putter;
+  grr.block_putter = memory_block_putter;
+  if (gcinfo)
+    grr.gcinfo = *gcinfo;
+  else
+    Gif_InitCompressInfo(&grr.gcinfo);
+  grr.errors = 0;
+  write_gif(gfs, &grr);
+  gfr->data = grr.v;
+  gfr->length = grr.pos;
+  return gfr;
+}
+
 
 #undef Gif_CompressImage
 #undef Gif_WriteFile
